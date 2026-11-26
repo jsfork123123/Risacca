@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Sfondo iniziale Risacca
+Exec=/usr/local/share/risacca/wallpaper.sh
+OnlyShowIn=XFCE;
+NoDisplay=true

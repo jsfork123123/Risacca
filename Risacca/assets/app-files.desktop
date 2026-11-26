@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=File
+Exec=thunar
+Icon=system-file-manager
+Terminal=false
+NoDisplay=true
