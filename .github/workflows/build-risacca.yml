@@ -1,0 +1,77 @@
+name: Build Risacca AMD64
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'Risacca/**'
+      - '.github/workflows/build-risacca.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  iso:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Reserve space on the hosted runner
+        run: |
+          set -eu
+          if [ "$(df --output=avail -BG . | tail -1 | tr -dc '0-9')" -lt 45 ]; then
+            sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup
+          fi
+          df -h .
+
+      - name: Assemble the FreeBSD installer
+        uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b
+        with:
+          release: "15.1"
+          arch: x86_64
+          disable-cache: true
+          sync: nfs
+          prepare: pkg install -y git
+          run: |
+            set -eu
+            shared=$(pwd)
+            build=$(mktemp -d /var/tmp/risacca.XXXXXX)
+            if [ "$(df -k "$build" | awk 'END {print $4}')" -lt 31457280 ]; then
+              image=$(mktemp "$shared/.risacca-build.XXXXXX")
+              truncate -s 36G "$image"
+              disk=$(mdconfig -a -t vnode -f "$image")
+              newfs -U "/dev/$disk"
+              mount "/dev/$disk" "$build"
+            fi
+            cp -R "$shared/Risacca/." "$build/"
+            cd "$build"
+            sh build.sh
+            mkdir -p "$shared/dist"
+            cp out/Risacca-15.1-amd64.iso* "$shared/dist/"
+            if [ -n "${disk:-}" ]; then
+              cd "$shared"
+              umount "$build"
+              mdconfig -d -u "${disk#md}"
+              rm -f "$image"
+            fi
+
+      - name: Verify the transferred ISO
+        working-directory: dist
+        run: |
+          set -eu
+          image=Risacca-15.1-amd64.iso
+          test "$(stat -c %s "$image")" -ge 5000000000
+          sha256sum --check "$image.sha256"
+          stat -c '%n %s bytes' "$image" >> "$GITHUB_STEP_SUMMARY"
+          cat "$image.sha256" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Risacca-FreeBSD-15.1-amd64
+          path: dist/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
