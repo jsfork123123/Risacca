@@ -1,6 +1,6 @@
 # Risacca per FreeBSD 15.1 amd64
 
-Questo progetto genera un DVD di installazione personalizzato per PC Intel e AMD a 64 bit. L'installazione è guidata da bsdinstall. Dopo il riavvio, LightDM apre la sessione Xfce dell'utente creato durante l'installazione. Il profilo include una barra superiore, un dock centrale, icone Papirus, uno sfondo originale e collegamenti a Firefox, Thunar, Mousepad e al terminale. Include anche LibreOffice e VLC.
+Questo progetto genera un DVD di installazione personalizzato per PC Intel e AMD a 64 bit. L'installazione è guidata da bsdinstall. Dopo il riavvio, LightDM apre la sessione Xfce dell'utente creato durante l'installazione. Il profilo include una barra superiore, un dock centrale, icone Papirus, uno sfondo originale e collegamenti a Firefox ESR, Thunar, Mousepad e al terminale. Include anche LibreOffice e VLC.
 
 ## Generare l'ISO
 
@@ -14,6 +14,8 @@ sh build.sh
 Il risultato è `out/Risacca-15.1-amd64.iso`. Nella stessa directory viene scritto il checksum SHA-256. La build verifica il DVD di partenza con l'hash pubblicato da FreeBSD, controlla il tag Git, risolve le dipendenze sul catalogo offline, controlla le voci del catalogo di avvio BIOS e UEFI e richiede almeno 5.000.000.000 byte. Tutto lo spazio dipende dai file inclusi. Il percorso dei file intermedi viene stampato a fine build.
 
 Il sistema di base proviene dal DVD binario ufficiale 15.1-RELEASE. Per la creazione del supporto viene usato `release/amd64/mkisoimages.sh` dal tag `release/15.1.0` del repository richiesto. Applicazioni e firmware provengono dai repository pkg configurati nella macchina FreeBSD di build. Usare la configurazione ufficiale per 15.1 con il repository dei moduli kernel abilitato. Le versioni dei pacchetti possono cambiare fra due build. L'inventario e il commit dei sorgenti sono registrati nell'ISO sotto `/risacca`.
+
+La build su GitHub Actions avvia l’ISO in due VM QEMU senza disco né rete, prima con BIOS e poi con UEFI. Il test controlla che entrambe arrivino alla schermata di benvenuto di bsdinstall.
 
 ## Avvio e installazione
 

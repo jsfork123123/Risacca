@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'Risacca/**'
+      - 'ci/test_boot.py'
       - '.github/workflows/build-risacca.yml'
 
 permissions:
@@ -75,3 +76,9 @@ jobs:
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
+
+      - name: Boot the installer with BIOS and UEFI
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends qemu-system-x86 ovmf tesseract-ocr python3-pil
+          /usr/bin/python3 ci/test_boot.py dist/Risacca-15.1-amd64.iso
