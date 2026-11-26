@@ -68,7 +68,8 @@ check_pkg update -f
 set -- $(cat packages.txt)
 # Allow pkg to create local.sqlite for this first simulated install.
 # The only configured repository is the file:// catalogue above.
-check_pkg install -n -r Risacca "$@" || fail 'Controllo delle dipendenze offline fallito.'
+# pkg 2.9 also uses the assumed yes/no answer as its dry-run exit status.
+check_pkg install -n -y -r Risacca "$@" || fail 'Controllo delle dipendenze offline fallito.'
 check_pkg rquery -r Risacca '%n-%v' | sort > "$media/pacchetti.txt"
 echo 'Risacca: { url: "file:///media/risacca/repo", enabled: yes }' > "$media/config/risacca.conf"
 image="$stage/Risacca.iso"

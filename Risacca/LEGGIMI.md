@@ -15,6 +15,8 @@ Il risultato è `out/Risacca-15.1-amd64.iso`. Nella stessa directory viene scrit
 
 Il sistema di base proviene dal DVD binario ufficiale 15.1-RELEASE. Per la creazione del supporto viene usato `release/amd64/mkisoimages.sh` dal tag `release/15.1.0` del repository richiesto. Applicazioni e firmware provengono dai repository pkg configurati nella macchina FreeBSD di build. Usare la configurazione ufficiale per 15.1 con il repository dei moduli kernel abilitato. Le versioni dei pacchetti possono cambiare fra due build. L'inventario e il commit dei sorgenti sono registrati nell'ISO sotto `/risacca`.
 
+La build su GitHub Actions avvia l’ISO in due VM QEMU senza disco né rete, prima con BIOS e poi con UEFI. Il test controlla che entrambe arrivino alla schermata di benvenuto di bsdinstall.
+
 ## Avvio e installazione
 
 Collegare l'ISO come lettore ottico a una VM amd64 e avviarla. Selezionare **Install**. Per usare il contenuto offline, scegliere i set locali del DVD quando viene proposta una sorgente di installazione. Creare un utente ordinario quando bsdinstall lo propone. Il profilo desktop viene installato alla fine, prima del riavvio. Rimuovere il supporto virtuale e accedere con l'utente appena creato. Per provare il programma di installazione, scegliere un disco virtuale vuoto. Il partizionamento scrive sul disco selezionato.
