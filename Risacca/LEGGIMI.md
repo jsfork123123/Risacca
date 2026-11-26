@@ -1,6 +1,6 @@
 # Risacca per FreeBSD 15.1 amd64
 
-Questo progetto genera un DVD di installazione personalizzato per PC Intel e AMD a 64 bit. L'installazione è guidata da bsdinstall. Dopo il riavvio, LightDM apre la sessione Xfce dell'utente creato durante l'installazione. Il profilo include una barra superiore, un dock centrale, icone Papirus, uno sfondo originale e collegamenti a Firefox, Thunar, Mousepad e al terminale. Include anche LibreOffice e VLC.
+Questo progetto genera un DVD di installazione personalizzato per PC Intel e AMD a 64 bit. L'installazione è guidata da bsdinstall. Dopo il riavvio, LightDM apre la sessione Xfce dell'utente creato durante l'installazione. Il profilo include una barra superiore, un dock centrale, icone Papirus, uno sfondo originale e collegamenti a Firefox ESR, Thunar, Mousepad e al terminale. Include anche LibreOffice e VLC.
 
 ## Generare l'ISO
 

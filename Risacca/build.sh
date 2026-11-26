@@ -20,6 +20,13 @@ case "$stage" in *[[:space:]]*) fail 'Usare un percorso senza spazi.' ;; esac
 tree=$stage/tree
 media=$tree/risacca
 mkdir -p "$tree"
+# pkg fetch can succeed even when it skips a requested package.
+pkg-static update -f
+pkg-static rquery -U '%n' > "$stage/available-packages"
+while IFS= read -r package; do
+    grep -Fxq -- "$package" "$stage/available-packages" || fail "Pacchetto non disponibile: $package"
+done < packages.txt
+
 base=FreeBSD-15.1-RELEASE-amd64-dvd1.iso
 digest=027504262c65e096d78bd345d74905a8a7216bbb3c6155d55634ae8328f76c5d
 if [ ! -f "cache/$base" ]; then
@@ -50,7 +57,6 @@ install -m 444 packages.txt "$media/packages.txt"
 install -m 555 "$(command -v pkg-static)" "$media/pkg-static"
 git -C "$stage/src" rev-parse HEAD > "$media/freebsd-src.commit"
 echo 'Risacca: preparazione del catalogo offline e delle dipendenze.'
-pkg-static update -f
 xargs pkg-static fetch -U -y -d -o "$media/repo" < packages.txt
 pkg-static repo "$media/repo"
 # Resolve the complete installation against the new catalogue and an empty
@@ -60,7 +66,9 @@ echo "Risacca: { url: \"file://$media/repo\", enabled: yes }" > "$stage/check-re
 check_pkg() { pkg-static -o PKG_DBDIR="$stage/check-db" -R "$stage/check-repos" "$@"; }
 check_pkg update -f
 set -- $(cat packages.txt)
-check_pkg install -n -U -r Risacca "$@"
+# Allow pkg to create local.sqlite for this first simulated install.
+# The only configured repository is the file:// catalogue above.
+check_pkg install -n -r Risacca "$@" || fail 'Controllo delle dipendenze offline fallito.'
 check_pkg rquery -r Risacca '%n-%v' | sort > "$media/pacchetti.txt"
 echo 'Risacca: { url: "file:///media/risacca/repo", enabled: yes }' > "$media/config/risacca.conf"
 image="$stage/Risacca.iso"
